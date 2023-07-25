@@ -5,8 +5,8 @@ import reachAudio from './assets/reach.m4a';*/
 import dino_hurt from './assets/dino-hurt-L.png';
 import groundImg from './assets/ground-L.png';
 import dino_idleImg from './assets/dino-idle-L.png';
-import restartImg from './assets/restart-L.png';
-import gameOverImg from './assets/game-over-L.png';
+import restartImg from './assets/retry.png';
+import gameOverImg from './assets/game-over-P2.png';
 import cloudImg from './assets/cloud-L.png';
 import starImg from './assets/stars-L.png';
 import moonImg from './assets/moon-L.png';
@@ -19,6 +19,8 @@ import obsticle_3Img from './assets/cactuses_small_3-L.png';
 import obsticle_4Img from './assets/cactuses_big_1-L.png';
 import obsticle_5Img from './assets/cactuses_big_2-L.png';
 import obsticle_6Img from './assets/cactuses_big_3-L.png';
+import galaxy from './assets/galaxy.png';
+
 //import test from  "./assets/test1.png";
 class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -40,7 +42,7 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('restart', restartImg);
     this.load.image('game-over', gameOverImg);
     this.load.image('cloud', cloudImg);
-
+    this.load.image('galaxy', galaxy);
     this.load.spritesheet('star', starImg, {
       frameWidth: 9,
       frameHeight: 9
