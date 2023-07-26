@@ -3,14 +3,18 @@ import jumpAudio from './assets/jump.m4a';
 import hitAudio from './assets/hit.m4a';
 import reachAudio from './assets/reach.m4a';*/
 import dino_hurt from './assets/dino-hurt-L.png';
+import coinImg from './assets/coin-S.png';
 import groundImg from './assets/ground-L.png';
 import dino_idleImg from './assets/dino-idle-L.png';
-import restartImg from './assets/retry.png';
+import restartImg from './assets/retry-S.png';
 import gameOverImg from './assets/game-over-P2.png';
 import cloudImg from './assets/cloud-L.png';
+import planetImg from './assets/pink-planet.png';
+import planetImg2 from './assets/planet2-80.png';
+import alienImg from './assets/alien.png';
 import starImg from './assets/stars-L.png';
 import moonImg from './assets/moon-L.png';
-import dinoImg from './assets/dino-run-L.png';
+import dinoImg from './assets/knight-run.png';
 import dino_downImg from './assets/dino-down-L.png';
 import enemy_birdImg from './assets/ufo-L.png';
 import obsticle_1Img from './assets/cactuses_small_1-L.png';
@@ -37,11 +41,15 @@ class PreloadScene extends Phaser.Scene {
 
     //this.load.image('test1', test );
     this.load.image('ground', groundImg);
+    this.load.image('coin', coinImg);
     this.load.image('dino-idle', dino_idleImg);
     this.load.image('dino-hurt', dino_hurt);
     this.load.image('restart', restartImg);
     this.load.image('game-over', gameOverImg);
     this.load.image('cloud', cloudImg);
+    this.load.image('planet1', planetImg);
+    this.load.image('alien1', alienImg);
+    this.load.image('planet2', planetImg2);
     this.load.image('galaxy', galaxy);
     this.load.spritesheet('star', starImg, {
       frameWidth: 9,

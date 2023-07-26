@@ -15,12 +15,10 @@ class PlayScene extends Phaser.Scene {
     this.dino = this.physics.add.sprite(0, height, 'dino-idle').setOrigin(0,1).setCollideWorldBounds(true).setGravityY(5000).setDepth(1).setBodySize(44, 92)
     this.isGameRunning = false; // make this false to stop game later
     this.respawnTime = 0;
-
-    
+    this.coinRespawnTime = 0;
     this.gameSpeed=10; // for moving ground
     this.score = 0; //starting score
-    this.coinCount=0; //used for coins later
-
+    this.coinsCount=0; // number of coins collected
 
     this.input.keyboard.enabled = true;
     this.game.canvas.focus();
@@ -29,7 +27,11 @@ class PlayScene extends Phaser.Scene {
     .setOrigin(1, 0)
     .setAlpha(0);
 
-    this.highScoreText = this.add.text(0, 0, "00000", {fill: "#a67c00", font: '900 35px Courier', resolution: 5})
+    this.highScoreText = this.add.text(0, 0, "00000", {fill: "#0FFFFF", font: '900 35px Courier', resolution: 5})
+    .setOrigin(1, 0)
+    .setAlpha(0);
+
+    this.coinText = this.add.text(240, 0, "00000", {fill: "#a67c00", font: '900 25px Courier', resolution: 5})
     .setOrigin(1, 0)
     .setAlpha(0);
 
@@ -37,7 +39,11 @@ class PlayScene extends Phaser.Scene {
     this.environment.addMultiple([
       this.add.image(width / 2, 170, 'cloud'),
       this.add.image(width - 80, 80, 'cloud'),
-      this.add.image((width / 1.3), 100, 'cloud')
+      this.add.image((width / 1.3), 100, 'cloud'),
+      this.add.image((width-100), 90, 'planet1'),
+      this.add.image((width/3), 130, 'planet2'),
+      this.add.image((width/3)-200, 130, 'cloud'),
+      //this.add.image((width/1.5), 180, 'alien1'),
     ]);
     this.environment.setAlpha(0);
 
@@ -49,10 +55,13 @@ class PlayScene extends Phaser.Scene {
     ])
 
     this.obsticles = this.physics.add.group();
+    this.coins= this.physics.add.group();    
 
 
+    //this.createStars();
     this.initAnims();
     this.initColliders();
+    this.initCoinCollider();
     this.initStartTrigger();
     this.handleInputs();
     this.handleScore();
@@ -109,6 +118,7 @@ class PlayScene extends Phaser.Scene {
             this.isGameRunning = true;
             this.dino.setVelocityX(0);
             this.scoreText.setAlpha(1);
+            this.coinText.setAlpha(1);
             this.environment.setAlpha(1);
             startEvent.remove();
           }
@@ -117,6 +127,36 @@ class PlayScene extends Phaser.Scene {
     }, null, this)
   }
 
+  /*createStars(){
+    
+    this.coins = this.physics.add.group({
+      key: 'coin',
+      repeat: 14,
+      setXY: { x: 12, y: 0, stepX: 50 }
+  });
+  
+  this.coins.children.iterate(function (child) {
+  
+      child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+  
+  });
+
+  this.physics.add.collider(this.dino, this.coins);
+  this.physics.add.overlap(this.dino, this.coins, this.collectCoins, null, this);
+
+  }
+
+  collectCoins(player, coin){
+    coin.disableBody(true,true);
+  }*/
+  
+  placeCoins(){
+    let coin;
+    coin = this.coins.create(this.game.config.width, this.game.config.height, `coin`)
+        .setOrigin(0, 1);
+    coin.body.offset.y = +10;
+    coin.setImmovable();
+  }
 
   placeObsticle() {
     const obsticleNum = Math.floor(Math.random() * 7) + 1;
@@ -155,13 +195,38 @@ class PlayScene extends Phaser.Scene {
       this.anims.pauseAll();
       this.dino.setTexture('dino-hurt');
       this.respawnTime = 0;
-      this.gameSpeed = 10;
+      this.coinRespawnTime=0;
+      this.gameSpeed = 7;
       this.gameOverScreen.setAlpha(1);
       this.score = 0;
+      //this.coinsCount=0; // wont zero that cuz ur gathering coins ERC20
       //this.hitSound.play();
     }, null, this);
   }
 
+
+  initCoinCollider(){
+    this.physics.add.collider(this.dino, this.coins, () => {
+      this.coinsCount += 1;
+      console.log("coin count" + this.coinsCount);
+      //this.hitSound.play();
+      
+      //this.coins.children.clear(true, true);
+      //let coin= this.coins.getChildren();
+      //this.coins.remove(coin,true,true)
+      this.physics.add.overlap(this.dino, this.coins, this.collectCoins, null, this);
+    }, null, this);
+  }
+
+  collectCoins(player, coin){
+    coin.disableBody(true,true);
+            //update coins text
+            const coinCtr = Array.from(String(this.coinsCount), Number);
+            for (let i = 0; i < 5 - String(this.coinsCount).length; i++) {
+              coinCtr.unshift(0);
+            }
+            this.coinText.setText("SRN Tokens:" + this.coinsCount);
+  }
 
   handleScore() {
     this.time.addEvent({
@@ -192,6 +257,7 @@ class PlayScene extends Phaser.Scene {
         }
 
         this.scoreText.setText(score.join(''));
+
       }
     })
   }
@@ -207,6 +273,7 @@ class PlayScene extends Phaser.Scene {
       this.dino.body.offset.y = 0;
       this.physics.resume();
       this.obsticles.clear(true, true);
+      this.coins.clear(true, true);
       this.isGameRunning = true;
       this.gameOverScreen.setAlpha(0);
       this.anims.resumeAll();
@@ -217,7 +284,7 @@ class PlayScene extends Phaser.Scene {
      //this.dino.body.setSize([],92,0)
      this.dino.body.height = 92;
      this.dino.body.offset.y = 0;
-     if(!this.dino.body.onFloor()){return;} 
+     if(!this.dino.body.onFloor()){return;} //uncomment to jump only if on ground
      this.dino.setVelocityY(-1600);
     })
 
@@ -247,6 +314,7 @@ class PlayScene extends Phaser.Scene {
 
   this.ground.tilePositionX+= this.gameSpeed;
   Phaser.Actions.IncX(this.obsticles.getChildren(), -this.gameSpeed);
+  Phaser.Actions.IncX(this.coins.getChildren(), -this.gameSpeed);
   Phaser.Actions.IncX(this.environment.getChildren(), - 1.5);
 
   this.respawnTime += delta * this.gameSpeed * 0.08;
@@ -254,6 +322,13 @@ class PlayScene extends Phaser.Scene {
     this.placeObsticle();
     this.respawnTime = 0;
   }
+
+  this.coinRespawnTime += delta * this.gameSpeed * 0.08;
+  if (this.coinRespawnTime >= 200) {
+    this.placeCoins();
+    this.coinRespawnTime = 0;
+  }
+
 
   // to clean objects from memory when out of screen // need one for coins
   this.obsticles.getChildren().forEach(obsticle => {
@@ -263,6 +338,15 @@ class PlayScene extends Phaser.Scene {
       //console.log("destroyed")
     }
   })
+
+    // to clean objects from memory when out of screen // need one for coins
+    this.coins.getChildren().forEach(coin => {
+      if (coin.getBounds().right < 0) {
+        this.coins.killAndHide(coin);
+        //obsticle.destroy()
+        //console.log("destroyed")
+      }
+    })
 
   //when clouds go out of bound load them at the start of screen again
   this.environment.getChildren().forEach(env => {
