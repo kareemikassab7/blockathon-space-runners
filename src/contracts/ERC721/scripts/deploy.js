@@ -1,19 +1,14 @@
-const { ethers } = require("hardhat");
+const hardhat = require("hardhat");
 
 async function main() {
-
-  // Get the contract owner
-  const contractOwner = await ethers.getSigners();
-  console.log(`Deploying contract from: ${contractOwner[0].address}`);
-
   // Hardhat helper to get the ethers contractFactory object
-  const NonFunToken = await ethers.getContractFactory('Game');
+  const NonFunToken = await hardhat.ethers.getContractFactory('Game');
 
   // Deploy the contract
   console.log('Deploying Game...');
   const nonFunToken = await NonFunToken.deploy();
-  await nonFunToken.deployed();
-  console.log(`Game deployed to: ${nonFunToken.address}`)
+  let addr = await nonFunToken.getAddress();
+  console.log(`Game deployed to: ${addr}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

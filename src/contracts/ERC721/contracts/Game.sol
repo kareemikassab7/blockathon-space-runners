@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Game is ERC721, Ownable {
     // Constructor will be called on contract creation
-    constructor() ERC721("NonFunToken", "NONFUN") {}
+    constructor() ERC721("Game", "DIN") {}
 
     // Allows minting of a new NFT
     function mintCollectionNFT(
