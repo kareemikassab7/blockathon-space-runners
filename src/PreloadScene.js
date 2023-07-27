@@ -23,7 +23,7 @@ import obsticle_3Img from './assets/cactuses_small_3-L.png';
 import obsticle_4Img from './assets/cactuses_big_1-L.png';
 import obsticle_5Img from './assets/cactuses_big_2-L.png';
 import obsticle_6Img from './assets/cactuses_big_3-L.png';
-import galaxy from './assets/galaxy.png';
+//import galaxy from './assets/galaxy.png';
 
 //import test from  "./assets/test1.png";
 class PreloadScene extends Phaser.Scene {
@@ -50,7 +50,7 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('planet1', planetImg);
     this.load.image('alien1', alienImg);
     this.load.image('planet2', planetImg2);
-    this.load.image('galaxy', galaxy);
+    //this.load.image('galaxy', galaxy);
     this.load.spritesheet('star', starImg, {
       frameWidth: 9,
       frameHeight: 9
