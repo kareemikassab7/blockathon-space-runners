@@ -12,7 +12,7 @@ module.exports = {
     hardhat: {},
     polygon_mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",
-      accounts: ["c3a265c1701040c053bcc180f4f1f38c1ec5001d54181fce9abca792b607879b"],
+      accounts: [process.env.KEY],
     },
   },
   etherscan: {

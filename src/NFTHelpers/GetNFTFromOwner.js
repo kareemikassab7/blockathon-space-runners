@@ -4,42 +4,39 @@ import { Alchemy, Network } from "alchemy-sdk";
 const { ethers } = require("ethers");
 //const fs = require("fs");
 
-//const abi = require("./ABI.json")
-
-
-const config = {
-    apiKey: "XnYsgkad_ym1FYlOslEstnMu3l284qOw",
-    network: Network.MATIC_MUMBAI,
-};
-
-const alchemy = new Alchemy(config);
+const abi = require("./Game.json")
+const key = require("./key.json")
 
 
 
-export const IfOwnsNFT = async (ownerAddress, NFT_Contract) => {
-    // Get all NFTs
-    /*const ownedNfts = await alchemy.nft.getNftsForOwner(ownerAddress);
+const provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
+const signer = new ethers.Wallet(key.account, provider)
 
-    let foundNFT = null;
+export const IfOwnsNFT = async (accountAddress, contractAddress) => {
+    console.log("heeeeeeeeeeeeeeere")
+    //try {
+    let account_addr = await accountAddress;
+    let contract_addr = await contractAddress;
 
-    for (const nft of ownedNfts) {
-        if (nft.contract.address === NFT_Contract) {
-            foundNFT = nft;
-            break; // We found the NFT, no need to continue searching
-        }
+    if (!account_addr || !contract_addr) {
+        console.log("Inputs not provided yet.");
+        return false;
     }
+    console.log("con", contract_addr, "   acc", account_addr);
 
-    if (foundNFT) {
-        console.log("NFT found!");
-        console.log("Title:", foundNFT.title);
-        console.log("Description:", foundNFT.description);
-        console.log("Token URI:", foundNFT.tokenUri.raw);
-        // Add more properties you want to display
+    const contract = new ethers.Contract(contract_addr, abi.abi, signer);
+    const balance = await contract.balanceOf(account_addr);
+    console.log(Number(balance))
+
+    if (balance > 0) {
+        // The account owns at least one NFT from the contract
+        console.log('The account owns NFTs from the contract.');
+        return true;
+        // You can further retrieve the token IDs owned by the account and check if they match the NFT in question.
     } else {
-        console.log("NFT not found with the predetermined contract address.");
-    }*/
-
-    return true;
+        console.log('The account does not own any NFT from the contract.');
+        return false
+    }
 };
 
 /*

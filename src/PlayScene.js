@@ -199,6 +199,9 @@ class PlayScene extends Phaser.Scene {
       this.gameSpeed = 7;
       this.gameOverScreen.setAlpha(1);
       this.score = 0;
+
+
+      /// call contract 
       //this.coinsCount=0; // wont zero that cuz ur gathering coins ERC20
       //this.hitSound.play();
     }, null, this);
