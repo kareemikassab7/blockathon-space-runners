@@ -6,6 +6,8 @@ import game from "./PreloadScene";
 import PlayScene from "./PlayScene";
 import { IfOwnsNFT } from './NFTHelpers/GetNFTFromOwner';
 
+export var user = "";
+
 function getMetaMaskAddress() {
   return new Promise((resolve, reject) => {
     // Check if MetaMask is installed and the provider is available
@@ -16,6 +18,7 @@ function getMetaMaskAddress() {
         .then((accounts) => {
           // Accounts will be an array of addresses
           const address = accounts[0];
+          user = address;
           resolve(address);
         })
         .catch((error) => {

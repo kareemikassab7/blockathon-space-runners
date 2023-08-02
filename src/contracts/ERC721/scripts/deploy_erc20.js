@@ -6,7 +6,7 @@ async function main() {
 
     // Deploy the contract
     console.log('Deploying Game...');
-    const erc20 = await SRNERC20.deploy();
+    const erc20 = await SRNERC20.deploy("GameToken", "SRN", 10, 10000000000);
     let addr = await erc20.getAddress();
     console.log(`Game deployed to: ${addr}`);
 }
