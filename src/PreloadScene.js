@@ -1,7 +1,8 @@
-import Phaser from 'phaser'; /*
-import jumpAudio from './assets/jump.m4a';
-import hitAudio from './assets/hit.m4a';
-import reachAudio from './assets/reach.m4a';*/
+import Phaser from 'phaser'; 
+import jumpAudio from './assets/jump.mp3';
+import hitAudio from './assets/hit.mp3';
+import reachAudio from './assets/reach.mp3';
+import gameMusic from './assets/gamemusic.mp3';
 import dino_hurt from './assets/dino-hurt-L.png';
 import coinImg from './assets/coin-S.png';
 import groundImg from './assets/ground-L.png';
@@ -14,7 +15,7 @@ import planetImg2 from './assets/planet2-80.png';
 import alienImg from './assets/alien.png';
 import starImg from './assets/stars-L.png';
 import moonImg from './assets/moon-L.png';
-import dinoImg from './assets/knight-run.png';
+import dinoImg from './assets/dino-run-L.png';
 import dino_downImg from './assets/dino-down-L.png';
 import enemy_birdImg from './assets/ufo-L.png';
 import obsticle_1Img from './assets/cactuses_small_1-L.png';
@@ -23,6 +24,9 @@ import obsticle_3Img from './assets/cactuses_small_3-L.png';
 import obsticle_4Img from './assets/cactuses_big_1-L.png';
 import obsticle_5Img from './assets/cactuses_big_2-L.png';
 import obsticle_6Img from './assets/cactuses_big_3-L.png';
+import background from './assets/background.png';
+import bullet_1 from './assets/cloud-L.png'
+
 //import galaxy from './assets/galaxy.png';
 
 //import test from  "./assets/test1.png";
@@ -32,10 +36,11 @@ class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    /*
+    //sounds
     this.load.audio('jump', jumpAudio);
     this.load.audio('hit', hitAudio);
-    this.load.audio('reach', reachAudio);*/
+    this.load.audio('reach', reachAudio);
+    this.load.audio('gameplayMusic', gameMusic);
 
 
 
@@ -50,6 +55,8 @@ class PreloadScene extends Phaser.Scene {
     this.load.image('planet1', planetImg);
     this.load.image('alien1', alienImg);
     this.load.image('planet2', planetImg2);
+    this.load.image('background_1', background);
+    this.load.image('bullet_1', bullet_1);
     //this.load.image('galaxy', galaxy);
     this.load.spritesheet('star', starImg, {
       frameWidth: 9,
@@ -75,7 +82,7 @@ class PreloadScene extends Phaser.Scene {
       frameWidth: 92,
       frameHeight: 77
     });
-
+    
     this.load.image('obsticle-1', obsticle_1Img);
     this.load.image('obsticle-2', obsticle_2Img);
     this.load.image('obsticle-3', obsticle_3Img);

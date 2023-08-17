@@ -6,18 +6,62 @@ const key = require("./NFTHelpers/key.json")
 const provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
 const signer = new ethers.Wallet(key.account, provider)
 
+
 async function mintReward(tokens) {
   let account_addr = user;
   let contract_addr = "0x2753263226d7869792B9a6765af0C2B345b8a116";
-
+  let Raef_acc = "0xF85f851479DD529D5C36648A51fd5696eeC7f290"
+  const gas_Limit = 200000;
+  const gas_Price = ethers.parseUnits('20', 'gwei');
   if (!account_addr || !contract_addr) {
     console.log("Inputs not provided yet.");
     return;
   }
+  console.log("the account adress is: " + account_addr)
   const contract = new ethers.Contract(contract_addr, abi.abi, signer);
-  const balance = await contract.transfer(account_addr, tokens * 100000000000000)
+  const balance = await contract.transfer(Raef_acc, tokens * 10000000000000,{gasLimit:50000, gasPrice:20} )//14 zeros
   console.log("Rewards Sent!")
 }
+
+/*async function mintReward(tokens) {
+  try {
+    const account_addr = user;
+    const contract_addr = "0x2753263226d7869792B9a6765af0C2B345b8a116"; 
+    const gasLimit = 200000; // Adjust the gas limit as needed
+    const gasPrice = ethers.utils.parseUnits('50', 'gwei'); // Adjust the gas price as needed
+
+    if (!account_addr || !contract_addr) {
+      console.log("Inputs not provided yet.");
+      return;
+    }
+
+    const contract = new ethers.Contract(contract_addr, abi.abi, signer);
+
+    // Convert tokens to the smallest unit (wei)
+    const tokensInWei = ethers.utils.parseUnits(tokens.toString(), 18);
+    // Prepare the transaction parameters
+    const txParams = {
+      to: contract_addr,
+      value: 0,
+      gasLimit,
+      gasPrice,
+    };
+
+    // Call the transfer function
+    const txResponse = await signer.sendTransaction({
+      ...txParams,
+      data: contract.interface.encodeFunctionData('transfer', [account_addr, tokensInWei]),
+    });
+
+    console.log("Transaction Hash:", txResponse.hash);
+    await txResponse.wait(); // Wait for the transaction to be mined
+
+    console.log("Rewards Sent!");
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}*/
+
 
 
 class PlayScene extends Phaser.Scene {
@@ -31,14 +75,16 @@ class PlayScene extends Phaser.Scene {
 
     this.startTrigger = this.physics.add.sprite(0, 10).setOrigin(0, 1).setImmovable();
     //this.galaxy = this.add.tileSprite(0, height, 2500, width, 'galaxy ').setOrigin(0, 1)
+    this.background = this.add.tileSprite(0, height, 2500, width, 'background_1').setOrigin(0, 1)
     this.ground = this.add.tileSprite(0, height, 240, 26, 'ground').setOrigin(0, 1)
-    this.dino = this.physics.add.sprite(0, height, 'dino-idle').setOrigin(0, 1).setCollideWorldBounds(true).setGravityY(5000).setDepth(1).setBodySize(44, 92)
+    this.dino = this.physics.add.sprite(0, height, 'dino-idle').setOrigin(0, 1).setCollideWorldBounds(true).setGravityY(950).setDepth(1).setBodySize(44, 92)
     this.isGameRunning = false; // make this false to stop game later
     this.respawnTime = 0;
     this.coinRespawnTime = 0;
-    this.gameSpeed = 10; // for moving ground
+    this.gameSpeed = 12; // for moving ground
     this.score = 0; //starting score
     this.coinsCount = 0; // number of coins collected
+
 
     this.input.keyboard.enabled = true;
     this.game.canvas.focus();
@@ -76,6 +122,7 @@ class PlayScene extends Phaser.Scene {
 
     this.obsticles = this.physics.add.group();
     this.coins = this.physics.add.group();
+    this.bullets = this.physics.add.group();
 
 
     //this.createStars();
@@ -85,6 +132,17 @@ class PlayScene extends Phaser.Scene {
     this.initStartTrigger();
     this.handleInputs();
     this.handleScore();
+    //this.initBulletsCollider();
+
+    //sounds
+    this.jumpSound = this.sound.add('jump');
+    this.hitSound = this.sound.add('hit');
+    this.reachSound = this.sound.add('reach');
+    this.gameplayMusic = this.sound.add('gameplayMusic', { loop: true });
+
+    this.gameplayMusic.play();
+
+
   }
 
   initAnims() {
@@ -106,6 +164,12 @@ class PlayScene extends Phaser.Scene {
       key: 'enemy-dino-fly',
       frames: this.anims.generateFrameNumbers('enemy-bird', { start: 0, end: 1 }),
       frameRate: 6,
+      repeat: -1
+    })
+    this.anims.create({
+      key: 'bullet_1',
+      frames: this.anims.generateFrameNumbers('bullet_1', { start: 0, end: 1 }),
+      frameRate: 10,
       repeat: -1
     })
   }
@@ -147,57 +211,54 @@ class PlayScene extends Phaser.Scene {
     }, null, this)
   }
 
-  /*createStars(){
-    
-    this.coins = this.physics.add.group({
-      key: 'coin',
-      repeat: 14,
-      setXY: { x: 12, y: 0, stepX: 50 }
-  });
-  
-  this.coins.children.iterate(function (child) {
-  
-      child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-  
-  });
 
-  this.physics.add.collider(this.dino, this.coins);
-  this.physics.add.overlap(this.dino, this.coins, this.collectCoins, null, this);
-
-  }
-
-  collectCoins(player, coin){
-    coin.disableBody(true,true);
-  }*/
 
   placeCoins() {
-    let coin;
-    coin = this.coins.create(this.game.config.width, this.game.config.height, `coin`)
-      .setOrigin(0, 1);
-    coin.body.offset.y = +10;
-    coin.setImmovable();
-  }
+    if (Math.random() > 0.9) {
+        let coin;
+        coin = this.coins.create(
+            this.game.config.width,
+            this.game.config.height - Phaser.Math.Between(50, 150), // Adjust the range for vertical placement
+            `coin`
+        )
+        .setOrigin(0, 1)
+        .setImmovable();
+        coin.body.offset.y = +10;
+    }
+}
+
 
   placeObsticle() {
     const obsticleNum = Math.floor(Math.random() * 7) + 1;
-    const distance = Phaser.Math.Between(600, 900);
+    const distance = Phaser.Math.Between(700, 1000);
 
     let obsticle;
     if (obsticleNum > 6) {
-      const enemyHeight = [20, 50];
-      obsticle = this.obsticles.create(this.game.config.width + distance, this.game.config.height - enemyHeight[Math.floor(Math.random() * 2)], `enemy-bird`)
+        const enemyHeight = [20, 50];
+        obsticle = this.obsticles.create(
+            this.game.config.width + distance,
+            this.game.config.height-400,
+            `enemy-bird`
+        )
         .setOrigin(0, 1)
-      obsticle.play('enemy-dino-fly', 1);
-      obsticle.body.height = obsticle.body.height / 1.5;
+        .setVelocityY(this.gameSpeed * 5); // Set Y velocity to fall down
+        obsticle.play('enemy-dino-fly', 1);
+        //obsticle.body.height = obsticle.body.height / 1.5;
+        console.log("flying obsticle is created");
     } else {
-      obsticle = this.obsticles.create(this.game.config.width + distance, this.game.config.height, `obsticle-${obsticleNum}`)
-        .setOrigin(0, 1);
-
-      obsticle.body.offset.y = +10;
+        obsticle = this.obsticles.create(
+            this.game.config.width + distance,
+            this.game.config.height,
+            `obsticle-${obsticleNum}`
+        )
+        .setOrigin(0, 1)
+        .setVelocityY(0); // Set initial Y velocity to zero
+        obsticle.body.offset.y = +10;
     }
 
     obsticle.setImmovable();
-  }
+}
+
 
 
   initColliders() {
@@ -220,9 +281,9 @@ class PlayScene extends Phaser.Scene {
       this.gameOverScreen.setAlpha(1);
       this.score = 0;
 
-
-      /// call contract 
-      await mintReward(newScore);
+      this.hitSound.play()
+      // call contract 
+      await mintReward(this.coinsCount);
 
       //this.coinsCount=0; // wont zero that cuz ur gathering coins ERC20
       //this.hitSound.play();
@@ -241,6 +302,14 @@ class PlayScene extends Phaser.Scene {
       //this.coins.remove(coin,true,true)
       this.physics.add.overlap(this.dino, this.coins, this.collectCoins, null, this);
     }, null, this);
+  }
+
+  initBulletsCollider() {
+    this.physics.add.overlap(this.obsticles, this.bullets, (_obstacle, bullet) => {
+      bullet.destroy(); // Destroy the bullet on collision with the dino
+      _obstacle.destroy();  
+      console.log('Bullet collided with an obsticle');
+    });
   }
 
   collectCoins(player, coin) {
@@ -287,6 +356,24 @@ class PlayScene extends Phaser.Scene {
     })
   }
 
+  shoot() {
+    console.log("shooting function is called, sir");
+
+    // Create a shooting sprite at the dino's position
+    let bullet = this.physics.add.sprite(this.dino.x + 30, this.dino.y - 60, 'bullet_1');
+    bullet.setVelocityX(this.gameSpeed + 300); 
+
+    // Set collision detection for the shooting sprite with obstacles
+    this.physics.add.overlap(bullet, this.obsticles, (bullet, obstacle) => {
+        // Destroy the bullet and the obstacle on collision
+        this.hitSound.play();
+        bullet.destroy();
+        obstacle.destroy();
+        console.log('Bullet collided with obstacle');
+    });
+}
+
+
 
   handleInputs() {
     console.log("handle inputs called")
@@ -310,13 +397,14 @@ class PlayScene extends Phaser.Scene {
       this.dino.body.height = 92;
       this.dino.body.offset.y = 0;
       if (!this.dino.body.onFloor()) { return; } //uncomment to jump only if on ground
-      this.dino.setVelocityY(-1600);
+      this.dino.setVelocityY(-700);
+      this.jumpSound.play();
     })
 
     //ducking
     this.input.keyboard.on('keydown-DOWN', () => {
       // console.log("ducking down")
-      if (!this.dino.body.onFloor() || !this.isGameRunning) { return; }
+      if (!this.isGameRunning) { return; }
       //this.dino.body.setSize([],58,34)
       this.dino.body.height = 58;
       this.dino.body.offset.y = 34;
@@ -332,12 +420,18 @@ class PlayScene extends Phaser.Scene {
 
     })
 
+    this.input.keyboard.on('keyup-X', () => {
+      if (!this.isGameRunning) { return; }
+      this.shoot();
+    })
+
   }
 
   update(time, delta) {
     if (!this.isGameRunning) { return; }
 
     this.ground.tilePositionX += this.gameSpeed;
+    this.background.tilePositionX += this.gameSpeed;
     Phaser.Actions.IncX(this.obsticles.getChildren(), -this.gameSpeed);
     Phaser.Actions.IncX(this.coins.getChildren(), -this.gameSpeed);
     Phaser.Actions.IncX(this.environment.getChildren(), - 1.5);
@@ -355,7 +449,7 @@ class PlayScene extends Phaser.Scene {
     }
 
 
-    // to clean objects from memory when out of screen // need one for coins
+    // to clean objects from memory when out of screen 
     this.obsticles.getChildren().forEach(obsticle => {
       if (obsticle.getBounds().right < 0) {
         this.obsticles.killAndHide(obsticle);
@@ -364,7 +458,7 @@ class PlayScene extends Phaser.Scene {
       }
     })
 
-    // to clean objects from memory when out of screen // need one for coins
+    // to clean objects from memory when out of screen
     this.coins.getChildren().forEach(coin => {
       if (coin.getBounds().right < 0) {
         this.coins.killAndHide(coin);
