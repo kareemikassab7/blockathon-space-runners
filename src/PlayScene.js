@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+//import Utils from './NFTHelpers/utils.js'
 import { user } from './App';
 const { ethers } = require("ethers");
 const abi = require("./NFTHelpers/SRN.json")
@@ -6,11 +7,22 @@ const key = require("./NFTHelpers/key.json")
 const provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
 const signer = new ethers.Wallet(key.account, provider)
 
+const getUserAddress = async() => {
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const chainId = await provider.getNetwork().chainId;
+  if (chainId === 80001) {
+      const signer = provider.getSigner();
+      const address = await signer.getAddress();
+      return address;
+  } else {
+      console.log("Please connect to mumbai testnet");
+  }
+}
 
 async function mintReward(tokens) {
   let account_addr = user;
   let contract_addr = "0x2753263226d7869792B9a6765af0C2B345b8a116";
-  let Raef_acc = "0xF85f851479DD529D5C36648A51fd5696eeC7f290"
+  let recepient_address = await getUserAddress();
   const gas_Limit = 200000;
   const gas_Price = ethers.parseUnits('20', 'gwei');
   if (!account_addr || !contract_addr) {
@@ -19,7 +31,8 @@ async function mintReward(tokens) {
   }
   console.log("the account adress is: " + account_addr)
   const contract = new ethers.Contract(contract_addr, abi.abi, signer);
-  const balance = await contract.transfer(Raef_acc, tokens * 10000000000000,{gasLimit:50000, gasPrice:20} )//14 zeros
+  console.log(`recepient_address: ${recepient_address}`);
+  const balance = await contract.transfer(recepient_address, tokens * 10000000000000,{gasLimit:50000, gasPrice: gas_Price} )//14 zeros
   console.log("Rewards Sent!")
 }
 
