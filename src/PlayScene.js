@@ -22,7 +22,7 @@ const getUserAddress = async() => {
 async function mintReward(tokens) {
   let account_addr = user;
   let contract_addr = "0x2753263226d7869792B9a6765af0C2B345b8a116";
-  let recepient_address = await getUserAddress();
+  let recepient_address = user;
   const gas_Limit = 200000;
   const gas_Price = ethers.parseUnits('20', 'gwei');
   if (!account_addr || !contract_addr) {

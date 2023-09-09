@@ -10,8 +10,8 @@ const { ethers } = require("ethers");
 const abi = require("./NFTHelpers/SRN.json");
 const contractABI = require("./NFTHelpers/Game.json")
 const key = require("./NFTHelpers/key.json")
-const nft_provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
-const signer = new ethers.Wallet(key.account, nft_provider)
+const nft_provider = new ethers.JsonRpcProvider('https://polygon-mumbai.infura.io/v3/4458cf4d1689497b9a38b1d6bbf05e78');
+const treasuryWallet = new ethers.Wallet(key.account, nft_provider)
 
 function getMetaMaskAddress() {
   return new Promise((resolve, reject) => {
@@ -49,24 +49,28 @@ const getUserAddress = async() => {
   }
 }
 
-const mintNFT = async () => {
-  try {
+///////// we need to mint an nft here
+const nft_contract_addr = "0x1E92Ca3c16cD85d6df6Fb3b6B85B413BDa67B939";
+const NFT_contract = new ethers.Contract(nft_contract_addr, contractABI.abi, treasuryWallet);
 
-let contract_addr = "0x1E92Ca3c16cD85d6df6Fb3b6B85B413BDa67B939";
+const mintNFT = async () => {
+let receipt;  
+  try { 
 let recepient_address = "0xF85f851479DD529D5C36648A51fd5696eeC7f290";
-const gas_Limit = 50000;
-const gas_Price = ethers.parseUnits('20', 'gwei');
-if (!recepient_address || !contract_addr) {
-  console.log("Inputs not provided yet.");
-  return;
-}
-const contract = new ethers.Contract(contract_addr, contractABI.abi, signer);
-const call =  await contract.mintCollectionNFT (recepient_address,{gasLimit:50000, gasPrice: gas_Price})//14 zeros
+let tokenId=77;
+const call = await NFT_contract.mintCollectionNFT(recepient_address, tokenId,
+  {
+      gasLimit: 5000000,
+      gasPrice: ethers.parseUnits("10", "gwei"),
+  }      
+  );
+receipt = await call.wait();
+console.log(JSON.stringify(receipt));
 console.log("minted to: "+ recepient_address);
   } catch(err) {
     console.log(`Error: ${err}`);
   }
-
+  return receipt;
 }
 
 function App() {
