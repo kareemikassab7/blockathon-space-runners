@@ -53,33 +53,13 @@ const getUserAddress = async() => {
 const nft_contract_addr = "0x8F13103eb824ADD01632Bd001AC332F8bfD1358D";
 const NFT_contract = new ethers.Contract(nft_contract_addr, contractABI.abi, treasuryWallet);
 
-const mintNFT = async () => {
-let receipt;  
-  try { 
-let recepient_address = "0xF85f851479DD529D5C36648A51fd5696eeC7f290";
-let tokenId=77;
-
-console.log ("calling mint...")
-const call = await NFT_contract.mintCollectionNFT(recepient_address,
-  {
-      gasLimit: 500000,
-      gasPrice: ethers.parseUnits("20", "gwei"),
-  }      
-  );
-  receipt = await call.wait();
-console.log(JSON.stringify(receipt));
-console.log("minted to: "+ recepient_address);
-  } catch(err) {
-    console.log(`Error: ${err}`);
-  }
-  return receipt;
-}
 
 function App() {
   const [userAddress, setUserAddress] = useState('');
   const [contractAddress, setContractAddress] = useState('0x8F13103eb824ADD01632Bd001AC332F8bfD1358D'); // Replace with your actual contract address
   const [ownsNFT, setOwnsNFT] = useState(null);
   const [gameInitialized, setGameInitialized] = useState(false);
+  const [mintNFT, setMintNFT] = useState(null);
 
   useEffect(() => {
     // Call the function to get the MetaMask addres
@@ -113,6 +93,37 @@ function App() {
   }, [userAddress, contractAddress]);
 //////////////
 ///////////////////
+
+//////////////// mint function //////////
+useEffect(() => {
+  const mintNFT = async () => {
+  let receipt;  
+    try { 
+  
+  let recepient_address = userAddress ;//"0xF85f851479DD529D5C36648A51fd5696eeC7f290";
+  let tokenId=77;
+  
+  console.log ("calling mint...")
+  
+  const call = await NFT_contract.mintCollectionNFT(recepient_address,
+    {
+        gasLimit: 500000,
+        gasPrice: ethers.parseUnits("20", "gwei"),
+    }      
+    );
+    receipt = await call.wait();
+  console.log(JSON.stringify(receipt));
+  console.log("minted to: "+ recepient_address);
+    } catch(err) {
+      console.log(`Error: ${err}`);
+    }
+    return receipt;
+  };
+  setMintNFT(() => mintNFT);
+  mintNFT();
+  }, [userAddress]);
+
+  ////////////////////
   useEffect(() => {
     if (ownsNFT !== null && !gameInitialized) {
       // Initialize the game once the ownership check is complete
@@ -151,7 +162,7 @@ function App() {
       ) : (
         <p>You do not own the NFT from this contract. Please acquire the NFT to play the game.</p>
       )}
-        <button onClick={mintNFT}>Mint NFT</button>
+        <button onClick={() => mintNFT()}>Mint NFT</button>
     </>
   );
 }
