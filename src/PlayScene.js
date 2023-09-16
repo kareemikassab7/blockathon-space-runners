@@ -7,74 +7,18 @@ const key = require("./NFTHelpers/key.json")
 const provider = new ethers.JsonRpcProvider('https://rpc-mumbai.maticvigil.com');
 const signer = new ethers.Wallet(key.account, provider)
 
-const getUserAddress = async() => {
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const chainId = await provider.getNetwork().chainId;
-  if (chainId === 80001) {
-      const signer = provider.getSigner();
-      const address = await signer.getAddress();
-      return address;
-  } else {
-      console.log("Please connect to mumbai testnet");
-  }
-}
-
 async function mintReward(tokens) {
   let account_addr = user;
   let contract_addr = "0x2753263226d7869792B9a6765af0C2B345b8a116";
   let recepient_address = user;
-  const gas_Limit = 200000;
   const gas_Price = ethers.parseUnits('20', 'gwei');
   if (!account_addr || !contract_addr) {
     console.log("Inputs not provided yet.");
     return;
   }
-  console.log("the account adress is: " + account_addr)
   const contract = new ethers.Contract(contract_addr, abi.abi, signer);
-  console.log(`recepient_address: ${recepient_address}`);
   const balance = await contract.transfer(recepient_address, tokens * 10000000000000,{gasLimit:50000, gasPrice: gas_Price} )//14 zeros
-  console.log("Rewards Sent!")
 }
-
-/*async function mintReward(tokens) {
-  try {
-    const account_addr = user;
-    const contract_addr = "0x2753263226d7869792B9a6765af0C2B345b8a116"; 
-    const gasLimit = 200000; // Adjust the gas limit as needed
-    const gasPrice = ethers.utils.parseUnits('50', 'gwei'); // Adjust the gas price as needed
-
-    if (!account_addr || !contract_addr) {
-      console.log("Inputs not provided yet.");
-      return;
-    }
-
-    const contract = new ethers.Contract(contract_addr, abi.abi, signer);
-
-    // Convert tokens to the smallest unit (wei)
-    const tokensInWei = ethers.utils.parseUnits(tokens.toString(), 18);
-    // Prepare the transaction parameters
-    const txParams = {
-      to: contract_addr,
-      value: 0,
-      gasLimit,
-      gasPrice,
-    };
-
-    // Call the transfer function
-    const txResponse = await signer.sendTransaction({
-      ...txParams,
-      data: contract.interface.encodeFunctionData('transfer', [account_addr, tokensInWei]),
-    });
-
-    console.log("Transaction Hash:", txResponse.hash);
-    await txResponse.wait(); // Wait for the transaction to be mined
-
-    console.log("Rewards Sent!");
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}*/
-
 
 
 class PlayScene extends Phaser.Scene {
