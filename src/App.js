@@ -11,7 +11,7 @@ const abi = require("./NFTHelpers/SRN.json");
 const contractABI = require("./NFTHelpers/Game.json")
 const key = require("./NFTHelpers/key.json")
 const nft_provider = new ethers.JsonRpcProvider('https://polygon-mumbai.infura.io/v3/4458cf4d1689497b9a38b1d6bbf05e78');
-const treasuryWallet = new ethers.Wallet(key.account, nft_provider)
+const treasuryWallet = new ethers.Wallet(key.account_kareem, nft_provider)
 
 function getMetaMaskAddress() {
   return new Promise((resolve, reject) => {
@@ -50,7 +50,7 @@ const getUserAddress = async() => {
 }
 
 ///////// we need to mint an nft here
-const nft_contract_addr = "0x1E92Ca3c16cD85d6df6Fb3b6B85B413BDa67B939";
+const nft_contract_addr = "0x8F13103eb824ADD01632Bd001AC332F8bfD1358D";
 const NFT_contract = new ethers.Contract(nft_contract_addr, contractABI.abi, treasuryWallet);
 
 const mintNFT = async () => {
@@ -58,13 +58,15 @@ let receipt;
   try { 
 let recepient_address = "0xF85f851479DD529D5C36648A51fd5696eeC7f290";
 let tokenId=77;
-const call = await NFT_contract.mintCollectionNFT(recepient_address, tokenId,
+
+console.log ("calling mint...")
+const call = await NFT_contract.mintCollectionNFT(recepient_address,
   {
-      gasLimit: 5000000,
-      gasPrice: ethers.parseUnits("10", "gwei"),
+      gasLimit: 500000,
+      gasPrice: ethers.parseUnits("20", "gwei"),
   }      
   );
-receipt = await call.wait();
+  receipt = await call.wait();
 console.log(JSON.stringify(receipt));
 console.log("minted to: "+ recepient_address);
   } catch(err) {
@@ -75,7 +77,7 @@ console.log("minted to: "+ recepient_address);
 
 function App() {
   const [userAddress, setUserAddress] = useState('');
-  const [contractAddress, setContractAddress] = useState('0x1E92Ca3c16cD85d6df6Fb3b6B85B413BDa67B939'); // Replace with your actual contract address
+  const [contractAddress, setContractAddress] = useState('0x8F13103eb824ADD01632Bd001AC332F8bfD1358D'); // Replace with your actual contract address
   const [ownsNFT, setOwnsNFT] = useState(null);
   const [gameInitialized, setGameInitialized] = useState(false);
 

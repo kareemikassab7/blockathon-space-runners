@@ -17,7 +17,7 @@ contract Game is ERC721, Ownable {
     // Allows minting of a new NFT
     function mintCollectionNFT(
         address collector,
-    ) public onlyOwner {
+    ) public {
         uint tokenId = _tokenIds.current();
         _safeMint(collector, tokenId);
         _tokenIds.increment();

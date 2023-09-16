@@ -5,7 +5,7 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     // Replace with the actual contract address after deployment
-    const contractAddress = "0x1E92Ca3c16cD85d6df6Fb3b6B85B413BDa67B939";
+    const contractAddress = "0x8F13103eb824ADD01632Bd001AC332F8bfD1358D";
     const tokenId = 1; // The desired token ID to mint
 
     // Get the contract instance
